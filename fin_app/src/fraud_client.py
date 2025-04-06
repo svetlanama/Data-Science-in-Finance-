@@ -10,7 +10,7 @@ api_url = "http://127.0.0.1:8502"
 st.title("Credit Scoring App")
 
 # Display site header
-image_path = "../images/dsif header 2.jpeg"
+image_path = "../images/ai-protection.png"
 try:
     img = Image.open(image_path)
     st.image(img, use_column_width=True)
@@ -24,28 +24,19 @@ col1, col2 = st.columns(2)
 with col1:
     age = st.number_input("Age", min_value=18, max_value=100)
     income = st.number_input("Annual Income ($)", min_value=0)
-    employment_length = st.number_input("Employment Length (years)", min_value=0)
-    credit_history_length = st.number_input("Credit History Length (years)", min_value=0)
+    transaction_amount = st.number_input("Transaction Amount ($)", min_value=0)
+    customer_balance = st.number_input("Customer Balance ($)", min_value=0)
 
 with col2:
     debt_to_income = st.number_input("Debt-to-Income Ratio (%)", min_value=0.0, max_value=100.0)
-    credit_utilization = st.number_input("Credit Utilization Ratio (%)", min_value=0.0, max_value=100.0)
-    number_of_credit_lines = st.number_input("Number of Credit Lines", min_value=0)
-    number_of_delinquencies = st.number_input("Number of Delinquencies (past 2 years)", min_value=0)
 
-# Prepare data for prediction
 data = {
-    "age": age,
-    "income": income,
-    "employment_length": employment_length,
-    "credit_history_length": credit_history_length,
-    "debt_to_income": debt_to_income,
-    "credit_utilization": credit_utilization,
-    "number_of_credit_lines": number_of_credit_lines,
-    "number_of_delinquencies": number_of_delinquencies
+    "customer_age": age,
+    "transaction_amount": transaction_amount,
+    "customer_balance": customer_balance,
 }
 
-if st.button("Show Credit Risk Factors (Feature Importance)"):
+if st.button("Display Feature Importance"):
     response = requests.get(f"{api_url}/feature-importance")
     print("Show Credit Risk Factors  REsponse")
     print(response.json())
@@ -60,28 +51,38 @@ if st.button("Show Credit Risk Factors (Feature Importance)"):
     ax.set_title('Credit Risk Factors')
     st.pyplot(fig)
 
-if st.button("Get Credit Score"):
+if st.button("Predict Fraud "):
     response = requests.post(f"{api_url}/predict/", json=data)
     result = response.json()
-    score = result['credit_score']
+
+    if result['fraud_prediction'] == 0:
+        st.write("Prediction: Not Fraud")
+    else:
+        st.write("Prediction: Fraud")
+
     confidence = result['confidence']
 
-    # Display credit score
-    st.subheader(f"Credit Score: {score}")
+    # Display  score
+    # st.subheader(f" Score: {score}")
     
     # Credit score range visualization
-    ranges = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent']
-    score_ranges = [300, 580, 670, 740, 800, 850]
-    score_index = next(i for i, x in enumerate(score_ranges) if x > score) - 1
-    
+    # ranges = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent']
+    # score_ranges = [300, 580, 670, 740, 800, 850]
+    # score_index = next(i for i, x in enumerate(score_ranges) if x > score) - 1
+    #
+    labels = ['Not Fraudulent', 'Fraudulent']
     fig, ax = plt.subplots()
-    colors = ['red', 'orange', 'yellow', 'lightgreen', 'green']
-    ax.bar(ranges, [1]*5, color=colors)
-    ax.set_title('Credit Score Range')
-    ax.set_xticks(range(len(ranges)))
-    ax.set_xticklabels(ranges)
-    ax.axvline(x=score_index, color='black', linestyle='--')
+    ax.bar(labels, confidence, color=['green', 'red'])
+    ax.set_ylabel('Confidence')
+    ax.set_title('Prediction Confidence')
     st.pyplot(fig)
+    # # colors = ['red', 'orange', 'yellow', 'lightgreen', 'green']
+    # # ax.bar(ranges, [1]*5, color=colors)
+    # # ax.set_title('Credit Score Range')
+    # # ax.set_xticks(range(len(ranges)))
+    # # ax.set_xticklabels(ranges)
+    # # ax.axvline(x=score_index, color='black', linestyle='--')
+    # st.pyplot(fig)
 
 if st.button("Show Credit Score Factors"):
     response = requests.post(f"{api_url}/predict/", json=data)
