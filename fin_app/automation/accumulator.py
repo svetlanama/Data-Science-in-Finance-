@@ -7,7 +7,10 @@ sys.path.insert(0, '../src/')
 sys.path.insert(0, '../data')
 sys.path.insert(0, '../')
 
-from conf.conf import landing_path_input_data
+# from conf.conf import landing_path_input_data
+
+landing_path_input_data = "../data/4-stream/automation_in"
+landing_path_output_data = "../data/4-stream/automation_out"
 
 # scan frequency
 scan_freq_seconds = 5

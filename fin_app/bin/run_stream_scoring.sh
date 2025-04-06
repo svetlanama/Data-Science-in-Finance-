@@ -7,7 +7,7 @@ echo "Starting up fastapi application in the background. Give it a few seconds..
 # kill all processes on port 8000 to start fresh:
 lsof -ti:8000 | xargs kill -9
 cd ../src/
-uvicorn dsif11app-fraud:app --reload &
+uvicorn fraud_api:app --reload &
 sleep 10
 
 echo "Starting up accumulator - will scan through transactions and score any new ones."

@@ -1,0 +1,2 @@
+New transactions detected. Time: 2025-04-06 20:15:05.534663
+Processing files:  ['to_score_2024_06_13_12_15_30.csv', 'to_score_2024_06_13_12_15_31.csv', 'to_score_2024_06_13_12_15_28.csv', 'to_score_2024_06_13_12_15_29.csv']

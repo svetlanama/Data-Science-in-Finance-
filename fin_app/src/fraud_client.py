@@ -1,3 +1,5 @@
+from datetime import date
+
 import streamlit as st
 import requests
 import numpy as np
@@ -23,18 +25,22 @@ col1, col2 = st.columns(2)
 
 with col1:
     age = st.number_input("Age", min_value=18, max_value=100)
-    income = st.number_input("Annual Income ($)", min_value=0)
+    # income = st.number_input("Annual Income ($)", min_value=0)
     transaction_amount = st.number_input("Transaction Amount ($)", min_value=0)
     customer_balance = st.number_input("Customer Balance ($)", min_value=0)
+    transaction_date = st.date_input("Transaction Date", value=date.today())
+    transaction_time = st.time_input("Transaction Time")
 
 with col2:
     debt_to_income = st.number_input("Debt-to-Income Ratio (%)", min_value=0.0, max_value=100.0)
 
-data = {
-    "customer_age": age,
-    "transaction_amount": transaction_amount,
-    "customer_balance": customer_balance,
-}
+    data = {
+        "customer_age": age,
+        "transaction_amount": transaction_amount,
+        "customer_balance": customer_balance,
+        "transaction_date": str(transaction_date),
+        "transaction_time": str(transaction_time),
+    }
 
 if st.button("Display Feature Importance"):
     response = requests.get(f"{api_url}/feature-importance")
@@ -64,7 +70,7 @@ if st.button("Predict Fraud "):
 
     # Display  score
     # st.subheader(f" Score: {score}")
-    
+
     # Credit score range visualization
     # ranges = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent']
     # score_ranges = [300, 580, 670, 740, 800, 850]
@@ -87,7 +93,7 @@ if st.button("Predict Fraud "):
 if st.button("Show Fraud Score Factors (Bar Plot)"):
     response = requests.post(f"{api_url}/predict/", json=data)
     result = response.json()
-    
+
     # Extract SHAP values and feature names
     shap_values = np.array(result['shap_values'])
     features = result['features']
