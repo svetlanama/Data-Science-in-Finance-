@@ -78,13 +78,13 @@ if st.button("Predict Fraud "):
     st.pyplot(fig)
     # # colors = ['red', 'orange', 'yellow', 'lightgreen', 'green']
     # # ax.bar(ranges, [1]*5, color=colors)
-    # # ax.set_title('Credit Score Range')
+    # # ax.set_title('Score Range')
     # # ax.set_xticks(range(len(ranges)))
     # # ax.set_xticklabels(ranges)
     # # ax.axvline(x=score_index, color='black', linestyle='--')
     # st.pyplot(fig)
 
-if st.button("Show Credit Score Factors"):
+if st.button("Show Fraud Score Factors (Bar Plot)"):
     response = requests.post(f"{api_url}/predict/", json=data)
     result = response.json()
     
@@ -93,10 +93,33 @@ if st.button("Show Credit Score Factors"):
     features = result['features']
 
     # Display SHAP values
-    st.subheader("Credit Score Factors Explanation")
+    st.subheader("Fraud Score Factors Explanation")
 
     # Bar plot for SHAP values
     fig, ax = plt.subplots()
     ax.barh(features, shap_values[0])
     ax.set_xlabel('Impact on Credit Score')
-    st.pyplot(fig) 
+    st.pyplot(fig)
+
+if st.button("Show Fraud Score Factors (Pie Plot)"):
+    response = requests.post(f"{api_url}/predict/", json=data)
+    result = response.json()
+
+    # Extract SHAP values and feature names
+    # shap_values = np.array(result['shap_values'])
+    shap_values = np.array(result['shap_values'])[0]
+    features = result['features']
+
+    st.subheader("SHAP Pie Chart")
+    # Take absolute values for pie chart
+    shap_abs = np.abs(shap_values)
+
+    fig, ax = plt.subplots()
+    ax.pie(
+        shap_abs,
+        labels=features,
+        autopct='%1.1f%%',
+        startangle=90
+    )
+    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    st.pyplot(fig)
