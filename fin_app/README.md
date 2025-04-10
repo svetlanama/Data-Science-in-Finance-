@@ -48,3 +48,6 @@ source run_stream_scoring.sh
 
 # Results
 ![batch.png](images%2Fbatch.png)
+
+# Anomaly Detection
+![anomaly.png](images%2Fanomaly.png)

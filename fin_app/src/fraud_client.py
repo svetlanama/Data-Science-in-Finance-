@@ -5,6 +5,7 @@ import requests
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
+import pandas as pd
 
 # API endpoint
 api_url = "http://127.0.0.1:8502"
@@ -25,7 +26,6 @@ col1, col2 = st.columns(2)
 
 with col1:
     age = st.number_input("Age", min_value=18, max_value=100)
-    # income = st.number_input("Annual Income ($)", min_value=0)
     transaction_amount = st.number_input("Transaction Amount ($)", min_value=0)
     customer_balance = st.number_input("Customer Balance ($)", min_value=0)
     transaction_date = st.date_input("Transaction Date", value=date.today())
@@ -129,3 +129,53 @@ if st.button("Show Fraud Score Factors (Pie Plot)"):
     )
     ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
     st.pyplot(fig)
+
+data_to_process = {
+    "files_to_process": ["to_score_2024_06_13_12_15_32.csv"],
+}
+
+if st.button("Detect Anomalies"):
+    response = requests.post(f"{api_url}/process", json={})
+    if response.status_code == 200:
+        result = response.json()
+        anomalies = result.get("anomalies", [])
+
+        st.success(f"✅ Found {len(anomalies)} anomalies!")
+
+        if anomalies:
+            # Convert to DataFrame for better display
+            df_anomalies = pd.DataFrame(anomalies)
+
+            # Optional: Format columns if needed
+            if "transaction_date" in df_anomalies.columns:
+                df_anomalies["transaction_date"] = pd.to_datetime(df_anomalies["transaction_date"]).dt.date
+
+            st.subheader("📋 Anomaly Table")
+            st.dataframe(df_anomalies)
+
+        else:
+            st.info("No anomalies found in the given date range.")
+    else:
+        st.error(f"❌ Server error: {response.status_code}")
+    # plt.figure(figsize=(10, 5))
+    # plt.scatter(input_data['transaction_date'], input_data['transaction_amount'], label='Transactions')
+    # plt.scatter(input_data['transaction_date'], input_data['transaction_amount'], color='red', label='Anomalies')
+    # plt.legend()
+    # plt.show()
+
+    # plt.figure(figsize=(10, 5))
+    #
+    # # Plot all transactions
+    # plt.scatter(input_data['transaction_date'], input_data['transaction_amount'], label='Transactions', alpha=0.6)
+    #
+    # # Plot anomalies
+    # plt.scatter(result['transaction_date'], result['transaction_amount'], color='red', label='Anomalies', s=100)
+    #
+    # plt.xlabel("Date")
+    # plt.ylabel("Transaction Amount")
+    # plt.title("Transaction Amounts and Detected Anomalies")
+    # plt.legend()
+    # plt.xticks(rotation=45)
+    # plt.tight_layout()
+    # plt.show()
+
